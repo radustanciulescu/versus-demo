@@ -1,0 +1,4 @@
+namespace = versus-dev
+version = 1.2.1
+cluster = eks-dev
+role = arn:aws:iam::036692858685:role/OrganizationAccountAccessRole

@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: versus-backend
+  labels:
+    app: versus-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: versus-backend
+  template:
+    metadata:
+      labels:
+        app: versus-backend
+    spec:
+      serviceAccountName: backend-deployment-sa
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "versus-backend-deployment-aws-secrets"
+      containers:
+        - name: versus-backend
+          image: 036692858685.dkr.ecr.us-east-1.amazonaws.com/versus-backend:IMAGE_VERSION
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets-store"
+              readOnly: true
+                    
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: versusdbsecret-k8s
+                key: MYSQL_ROOT_PASSWORD
+          - name: MYSQL_DATABASE
+            valueFrom:
+              secretKeyRef:
+                name: versusdbsecret-k8s
+                key: MYSQL_DATABASE
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: versusdbsecret-k8s
+                key: MYSQL_USER
+          - name: MYSQL_PASSWORD
+            valueFrom:
+            secretKeyRef:
+              name: versusdbsecret-k8s
+              key: MYSQL_PASSWORD
+          - name: MYSQL_HOST
+            valueFrom:
+              secretKeyRef:
+                name: versusdbsecret-k8s
+                key: MYSQL_HOST
+          - name: MYSQL_PORT
+            valueFrom:
+              secretKeyRef:
+                name: versusdbsecret-k8s
+                key: MYSQL_PORT
+
+
+         
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: versus-backend-svc
+spec:
+  selector:
+    app: versus-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: versus-mysql
+  labels:
+    app: versus-dev
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: versus-dev
+    tier: mysql
+  #clusterIP: None
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: mysql-pv-claim
+#   labels:
+#     app: versus-dev
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: versus-mysql
+  labels:
+    app: versus-dev
+spec:
+  selector:
+    matchLabels:
+      app: versus-dev
+      tier: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: versus-dev
+        tier: mysql
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
+        - name: MYSQL_DATABASE
+          value: "versus-dev"
+        - name: MYSQL_USER
+          value: "dev"
+        - name: MYSQL_PASSWORD
+          value: "password"
+        - name: MYSQL_HOST
+          value: "127.0.0.1"
+        - name: MYSQL_PORT
+          value: "3306"
+
+        
+        ports:
+        - containerPort: 3306
+          name: mysql
+      #   volumeMounts:
+      #   - name: mysql-persistent-storage
+      #     mountPath: /var/lib/mysql
+      # volumes:
+      # - name: mysql-persistent-storage
+      #   persistentVolumeClaim:
+      #     claimName: mysql-pv-claim
