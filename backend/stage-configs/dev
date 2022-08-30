@@ -1,0 +1,6 @@
+namespace = versus-dev
+version = 1.3.4
+cluster = eks-dev
+dbsecret = versusdb-secret
+role = arn:aws:iam::036692858685:role/OrganizationAccountAccessRole
+policy = arn:aws:iam::036692858685:policy/versus-backend-deployment-policy

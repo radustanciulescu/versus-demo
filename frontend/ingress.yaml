@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: versus-frontend-ingress
+  annotations:  # use the shared ingress-nginx
+   kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: versus-STAGE-web-22acentos.exchangeweb.net
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: versus-frontend-svc
+            port:
+              number: 80
+
+
+
+
